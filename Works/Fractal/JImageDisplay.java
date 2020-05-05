@@ -5,8 +5,12 @@ import java.awt.image.BufferedImage;
 
 class JImageDisplay extends JComponent { // JImageDisplay расширяет возможности JComponent
     private BufferedImage buffer;  // Управляет изображением, содержимое которого можно записать
+        public BufferedImage getImage() {
+            return buffer;
+        }
 
-    public JImageDisplay(int width, int height) {
+
+        public JImageDisplay(int width, int height) {
         buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         // Тип изображения TYPE_INT_RGB определяет, как цвета каждого пикселя будут представлены в изображении; значение TYPE_INT_RGB обозначает, что
         // красные, зеленые и синие компоненты имеют по 8 битов, представленные в формате int в указанном порядке
