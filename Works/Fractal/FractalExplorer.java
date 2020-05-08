@@ -10,92 +10,95 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 
 public class FractalExplorer {
+    // Поля для кнопки сохранения, кнопки сброса и коллекции для enableUI
+    private JButton save_Button;
+    private JButton reset_Button;
+    private JComboBox Combo_Box;
     private int size;
     private JImageDisplay display;
     private FractalGenerator gen;
     private Rectangle2D.Double d2;
+    private int rows_remaining;
 
-    public FractalExplorer(int size){
-        this.size=size;
-        gen=new Burning_Ship();
-        d2= new Rectangle2D.Double();
+    public FractalExplorer(int size) {
+        this.size = size;
+        gen = new Burning_Ship();
+        d2 = new Rectangle2D.Double();
         gen.getInitialRange(d2);
-        display=new JImageDisplay(size,size);
+        display = new JImageDisplay(size, size);
 
-        }
+    }
 
 
-        public  void createAndShowGUI (){
+    public void createAndShowGUI() {
         display.setLayout(new BorderLayout());
         JFrame JimageDisplay = new JFrame("Fractal Explorer");
-        JimageDisplay.add(display,BorderLayout.CENTER);
-            JButton resetButton = new JButton("Reset");
-            ButtonHandler handler = new FractalExplorer.ButtonHandler();
-            resetButton.addActionListener(handler);
-            JimageDisplay.add(resetButton, BorderLayout.SOUTH);
+        JimageDisplay.add(display, BorderLayout.CENTER);
+        reset_Button = new JButton("Reset");
+        ButtonHandler handler = new FractalExplorer.ButtonHandler();
+        reset_Button.addActionListener(handler);
+        JimageDisplay.add(reset_Button, BorderLayout.SOUTH);
 
-            MouseHandler click = new MouseHandler();
-            display.addMouseListener( click);
+        MouseHandler click = new MouseHandler();
+        display.addMouseListener(click);
 
-            // Операция закрытия окна по умолчанию:
-            JimageDisplay.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            JComboBox ComboBox = new JComboBox();
-            FractalGenerator mandelbrot = new Mandelbrot();
-            ComboBox.addItem(mandelbrot);
-            FractalGenerator tricorn = new Tricorn();
-            ComboBox.addItem(tricorn);
-            FractalGenerator burning_Ship = new Burning_Ship();
-            ComboBox.addItem(burning_Ship);
-            //Создаем кнопку для выбора фрактала из коллекции
-            ButtonHandler fractalChooser = new ButtonHandler();
-            ComboBox.addActionListener(fractalChooser);
-            JPanel DisplayPanel = new JPanel();
-            JLabel myLabel = new JLabel("Fractal:");
-            DisplayPanel.add(myLabel);
-            DisplayPanel.add(ComboBox);
-            JimageDisplay.add(DisplayPanel, BorderLayout.NORTH);
-            //Создаем кнопку для сохранения изображения фрактала
-            JButton saveButton = new JButton("Save");
-            JPanel myBottomPanel = new JPanel();
-            myBottomPanel.add(saveButton);
-            myBottomPanel.add(resetButton);
-            JimageDisplay.add(myBottomPanel, BorderLayout.SOUTH);
+        // Операция закрытия окна по умолчанию:
+        JimageDisplay.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Combo_Box = new JComboBox();
+        FractalGenerator mandelbrot = new Mandelbrot();
+        Combo_Box.addItem(mandelbrot);
+        FractalGenerator tricorn = new Tricorn();
+        Combo_Box.addItem(tricorn);
+        FractalGenerator burning_Ship = new Burning_Ship();
+        Combo_Box.addItem(burning_Ship);
+        //Создаем кнопку для выбора фрактала из коллекции
+        ButtonHandler fractalChooser = new ButtonHandler();
+        Combo_Box.addActionListener(fractalChooser);
+        JPanel DisplayPanel = new JPanel();
+        JLabel myLabel = new JLabel("Fractal:");
+        DisplayPanel.add(myLabel);
+        DisplayPanel.add(Combo_Box);
+        JimageDisplay.add(DisplayPanel, BorderLayout.NORTH);
+        //Создаем кнопку для сохранения изображения фрактала
+        save_Button = new JButton("Save");
+        JPanel myBottomPanel = new JPanel();
+        myBottomPanel.add(save_Button);
+        myBottomPanel.add(reset_Button);
+        JimageDisplay.add(myBottomPanel, BorderLayout.SOUTH);
 
-            ButtonHandler saveHandler = new ButtonHandler();
-            saveButton.addActionListener(saveHandler);
+        ButtonHandler saveHandler = new ButtonHandler();
+        save_Button.addActionListener(saveHandler);
 
 
-            JimageDisplay.pack();
-            JimageDisplay.setVisible(true);
-            JimageDisplay.setResizable(false);
-        }
-
-    private void drawFractal() { // Метод для вывода на экран фрактала, должен циклически проходить через каждый пиксель в отображении (т.е. значения x и y будут меняться от 0 до размера отображения)
-        for (int x = 0; x < size; x++) {
-            for (int y = 0; y < size; y++) { //x, y - пиксельная координата; xCoord, yCoord - координата в пространстве фрактала
-                // Получим координаты x и у, соответствующих координатам пикселя X и У
-                double xCoord = gen.getCoord(d2.x, d2.x + d2.width, size, x);
-                double yCoord = gen.getCoord(d2.y, d2.y + d2.height, size, y);
-                // Вычислим количество итераций для соответствующих координат в области отображения фрактала
-                int iteration = gen.numIterations(xCoord, yCoord);
-
-                if (iteration == -1) { // Если число итераций равно -1 (т.е. точка не выходит за границы),установим пиксель в черный цвет (для rgb значение 0).
-                    display.drawPixel(x, y, 0);
-                }
-                else { // Иначе выберем значение цвета, основанное на количестве итераций
-                    // Воспользуемся цветовым пространством HSV: поскольку значение цвета
-                    // варьируется от 0 до 1, получается плавная последовательность цветов от
-                    // красного к желтому, зеленому, синему, фиолетовому и затем обратно к красному
-                    float hue = 0.7f + (float) iteration / 200f;
-                    int rgbColor = Color.HSBtoRGB(hue, 1f, 1f);
-                    // Обновим отображение в соответствии с цветом для каждого пикселя
-                    display.drawPixel(x, y, rgbColor);
-                }
-            }
-
-        }
-        display.repaint(); // Обновим JimageDisplay в соответствии с текущим изображением
+        JimageDisplay.pack();
+        JimageDisplay.setVisible(true);
+        JimageDisplay.setResizable(false);
     }
+
+
+
+    private void drawFractal() {
+        // Метод для вывода на экран фрактала, должен циклически проходить через каждый пиксель в отображении (т.е. значения x и y будут меняться от 0 до размера отображения)
+        // Необходим, чтобы отключить все элементы управления пользовательского интерфейса во время рисования
+        enableUI(false);
+        // Установим общее количество оставшихся строк
+        rows_remaining = size;
+        // Переберём каждую строку и вызовем перерисовку
+        for (int x=0; x<size; x++) {
+            FractalWorker draw = new FractalWorker(x);
+            draw.execute();
+        }
+    }
+    // Метод включает или отключает кнопки с коллекцией в пользовательском
+    // интерфейсе на основе указанного параметра
+    private void enableUI(boolean val) {
+        Combo_Box.setEnabled(val);
+        reset_Button.setEnabled(val);
+        save_Button.setEnabled(val);
+    }
+
+
+
     // Внутренний класс для обработки событий от кнопок
     private class ButtonHandler implements ActionListener {
         public void actionPerformed(ActionEvent e) {
@@ -132,7 +135,6 @@ public class FractalExplorer {
 
                     //Класс javax.imageio.ImageIO обеспечивает простые операции загрузки и сохранения изображения
                     java.io.File file = chooser.getSelectedFile();
-                    String file_name = file.toString();
                     // Попытка сохранить фрактал на диск
                     try {
                         BufferedImage displayImage = display.getImage();
@@ -152,24 +154,27 @@ public class FractalExplorer {
     // Внутренний класс для обработки событий от кнопки сброса. Обработчик сбрасывает
     // диапазон к начальному, определенному генератором, а затем перерисовает фрактал
     private class ResetHandler implements ActionListener {
-        public void actionPerformed(ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
             gen.getInitialRange(d2);
             drawFractal();
         }
     }
 
     // Внутренний класс для обработки событий с дисплея от мыши
-    private class MouseHandler extends MouseAdapter implements MouseListener {
-
+    // Внутренний класс для обработки событий с дисплея от мыши
+    private class MouseHandler extends MouseAdapter {
         @Override // Переопределим метод
         // При получении события о щелчке мышью, класс должен
         // отобразить пиксельные кооринаты щелчка в область фрактала, а затем вызвать
         // метод генератора recenterAndZoomRange с координатами, по которым щелкнули, и масштабом 0.5, что приведёт к увеличению фрактала
         public void mouseClicked(MouseEvent e) {
+            // Вернуться, если количество оставшихся строк не равно 0
+            if (rows_remaining != 0) {
+                return;
+            }
             // Получение координаты х области щелчка мыши
             int x = e.getX();
-            double xCoord = gen.getCoord(d2.x, d2.x + d2.width, size, x);
+            double xCoord =gen.getCoord(d2.x, d2.x + d2.width, size, x);
             // Получение координаты у области щелчка мыши
             int y = e.getY();
             double yCoord = gen.getCoord(d2.y, d2.y + d2.height, size, y);
@@ -179,6 +184,51 @@ public class FractalExplorer {
             drawFractal();
         }
     }
+
+    private class FractalWorker extends SwingWorker<Object, Object> {
+        int y;
+        int[] mas;
+
+        FractalWorker(int y) {
+            this.y = y;
+        }
+
+        protected Object doInBackground() {
+            mas = new int[size];
+            for (int i=0; i< mas.length; i++){
+                double xCoord = gen.getCoord(d2.x, d2.x + d2.width, size, i);
+                double yCoord = gen.getCoord(d2.y, d2.y + d2.height, size, y);
+                // Вычислим количество итераций для соответствующих координат в области отображения фрактала
+                int iteration = gen.numIterations(xCoord, yCoord);
+
+                if (iteration == -1) { // Если число итераций равно -1 (т.е. точка не выходит за границы),установим пиксель в черный цвет (для rgb значение 0).
+                    mas[i] = 0;
+
+                } else { // Иначе выберем значение цвета, основанное на количестве итераций
+                    // Воспользуемся цветовым пространством HSV: поскольку значение цвета
+                    // варьируется от 0 до 1, получается плавная последовательность цветов от
+                    // красного к желтому, зеленому, синему, фиолетовому и затем обратно к красному
+                    float hue = 0.7f + (float) iteration / 200f;
+                    int rgbColor = Color.HSBtoRGB(hue, 1f, 1f);
+                    mas[i] = rgbColor;
+                }
+            }
+
+
+            return null;
+        }
+    protected void done() {
+        for (int i = 0; i < mas.length; i++) {
+            display.drawPixel(i, y, mas[i]);
+        }
+        display.repaint(0, 0, y, size, 1); // Метод, который позволяет указать область для перерисовки фрактала
+        rows_remaining--;
+        if (rows_remaining== 0) {
+            enableUI(true);
+        }
+    }
+}
+
     public static void main(String[] args)
     {
         FractalExplorer explorer = new FractalExplorer(500);

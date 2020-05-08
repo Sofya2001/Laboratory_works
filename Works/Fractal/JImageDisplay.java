@@ -9,7 +9,6 @@ class JImageDisplay extends JComponent { // JImageDisplay расширяет в�
             return buffer;
         }
 
-
         public JImageDisplay(int width, int height) {
         buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         // Тип изображения TYPE_INT_RGB определяет, как цвета каждого пикселя будут представлены в изображении; значение TYPE_INT_RGB обозначает, что

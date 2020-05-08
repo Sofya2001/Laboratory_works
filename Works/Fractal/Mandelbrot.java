@@ -3,16 +3,19 @@ package Fractal;
 import java.awt.geom.Rectangle2D;
 
 class Mandelbrot extends FractalGenerator {
-    public String toString(){
+    public String toString() {
         return "Mandelbrot";
     }
+
     public void getInitialRange(Rectangle2D.Double range) { // Double класс определяет диапазон (range) прямоугольника в координатах х и у
-        range.x=-2; //x для Мандельброта
-        range.y=-1.5; //y для Мандельброта
-        range.width=3; // Ширина для Мандельброта
-        range.height=3; // Высота для Мандельброта
+        range.x = -2; //x для Мандельброта
+        range.y = -1.5; //y для Мандельброта
+        range.width = 3; // Ширина для Мандельброта
+        range.height = 3; // Высота для Мандельброта
     }
+
     public static final int MAX_ITERATIONS = 2000; //Константа с максимальным количеством итераций
+
     public int numIterations(double x, double y) { // Реализует итеративную функцию для фрактала Мандельброта (рассчитывает количество итераций для соответсвующей координаты
         int iteration = 0;
         double real = 0;
@@ -22,10 +25,9 @@ class Mandelbrot extends FractalGenerator {
             double imaginaryUpdated = 2 * real * imaginary + y;
             real = realUpdated;
             imaginary = imaginaryUpdated;
-            iteration ++;
+            iteration++;
         }
-        if (iteration == MAX_ITERATIONS)
-        {
+        if (iteration == MAX_ITERATIONS) {
             return -1;
         }
         return iteration;

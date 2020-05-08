@@ -30,8 +30,7 @@ public abstract class FractalGenerator {
         assert coord >= 0 && coord < size;
 
         double range = rangeMax - rangeMin;
-        return rangeMin + (range * (double) coord / (double) size);
-    }
+        return rangeMin + (range * (double) coord / (double) size); }
 
 
     /**

@@ -24,10 +24,7 @@ class Tricorn extends FractalGenerator {
             imaginary = imaginaryUpdated;
             iteration += 1;
         }
-        if (iteration == MAX_ITERATIONS)
-        {
-            return -1;
-        }
+        if (iteration == MAX_ITERATIONS){ return -1; }
         return iteration;
     }
 
